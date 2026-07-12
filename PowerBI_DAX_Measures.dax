@@ -1,0 +1,48 @@
+// =====================================================================
+// CarePulse - Power BI measures
+// Import carepulse_powerbi_ready.csv and name the table 'Encounters'.
+// Set numeric columns to "Don't summarize"; text label columns need no change.
+// =====================================================================
+
+Total Encounters =
+COUNTROWS ( 'Encounters' )
+// format: #,0
+
+30-Day Readmission Rate % =
+DIVIDE ( SUM ( 'Encounters'[readmitted_30d_flag] ), [Total Encounters] )
+// format: 0.0%
+
+Overall Readmission Rate % =
+DIVIDE ( SUM ( 'Encounters'[readmitted_any_flag] ), [Total Encounters] )
+// readmitted at any time (<30 or >30); format: 0.0%
+
+Average Length of Stay (ALOS) =
+AVERAGE ( 'Encounters'[time_in_hospital] )
+// days; format: 0.0
+
+High-Risk Cohort Readmission Rate % =
+CALCULATE (
+    [30-Day Readmission Rate %],
+    'Encounters'[triage_cohort_label] = "High Risk (D09-D10)"
+)
+// top 20% of model risk scores; format: 0.0%
+
+Top 20% Risk Cohort Capture % =
+DIVIDE (
+    CALCULATE (
+        SUM ( 'Encounters'[readmitted_30d_flag] ),
+        'Encounters'[triage_cohort_label] = "High Risk (D09-D10)"
+    ),
+    CALCULATE (
+        SUM ( 'Encounters'[readmitted_30d_flag] ),
+        ALL ( 'Encounters'[triage_cohort_label] )
+    )
+)
+// share of all 30-day readmissions found in deciles 9-10; format: 0.0%
+
+// ---- optional helper ----
+Prior Inpatient 2+ & HbA1c >8 Readmission Rate % =
+CALCULATE (
+    [30-Day Readmission Rate %],
+    'Encounters'[high_risk_segment_label] = "2+ prior inpatient & HbA1c >8"
+)

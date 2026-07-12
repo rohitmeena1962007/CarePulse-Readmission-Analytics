@@ -1,0 +1,9 @@
+admission_type_id,admission_category,admission_source_category
+1,Emergency,Emergency Room
+2,Urgent,Referral
+3,Elective,Referral
+4,Newborn,Transfer from another facility
+5,Other,Other
+6,Other,Other
+7,Other,Emergency Room
+8,Other,Referral
